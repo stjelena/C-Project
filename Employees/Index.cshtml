@@ -1,0 +1,99 @@
+﻿@page
+@model WebApplication1.Pages.Employees.IndexModel
+@{
+}
+<body>
+
+    <h2>List of employees</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee name</th>
+                <th>Total hours</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.EmployeeDifferences)
+            {
+                <tr style="@(item.Difference < 100 ? "background-color: red;" : "")">
+                    <td>@item.EmployeeName</td>
+                    <td>@item.Difference hours</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+
+    <h2>PieChart</h2>
+
+    <svg width="400" height="400">
+        @{
+            // Total hour difference
+            int totalDifference = Model.EmployeeDifferences.Sum(item => item.Difference);
+
+            // Initial values for pie chart drawing
+            int centerX = 200;
+            int centerY = 200;
+            int radius = 150;
+            double startAngle = 0;
+
+           
+            foreach (var item in Model.EmployeeDifferences)
+            {
+                // Calculate percentage
+                double percentage = (double)item.Difference / totalDifference;
+
+                // Calculate end angle for the slice
+                double endAngle = startAngle + percentage * 360;
+
+                // Calculate slice coordinates
+                double startX = centerX + radius * Math.Cos(startAngle * Math.PI / 180);
+                double startY = centerY + radius * Math.Sin(startAngle * Math.PI / 180);
+                double endX = centerX + radius * Math.Cos(endAngle * Math.PI / 180);
+                double endY = centerY + radius * Math.Sin(endAngle * Math.PI / 180);
+
+                // Calculate positions
+                double labelX = centerX + 1.1 * radius * Math.Cos((startAngle + endAngle) / 2 * Math.PI / 180);
+                double labelY = centerY + 1.1 * radius * Math.Sin((startAngle + endAngle) / 2 * Math.PI / 180);
+
+
+                double percentageX = centerX + 0.5 * radius * Math.Cos((startAngle + endAngle) / 2 * Math.PI / 180);
+                double percentageY = centerY + 0.5 * radius * Math.Sin((startAngle + endAngle) / 2 * Math.PI / 180);
+
+
+                // Draw the slice
+                <path d="M @centerX,@centerY L @startX,@startY A @radius,@radius 0 @(percentage > 0.5 ? 1 : 0),1 @endX,@endY Z" fill="@RandomColor()">
+                    <title>@item.EmployeeName: @item.Difference hours</title>
+                </path>
+
+                
+                <text>
+                <text x="@labelX" y="@labelY" fill="black" font-size="12" text-anchor="middle">@item.EmployeeName</text>
+                </text>
+
+                <text>
+                <text x="@percentageX" y="@percentageY" fill="black" font-size="12" text-anchor="middle">@((percentage * 100).ToString("0.##"))%</text>
+                </text>
+
+                // Update start angle for the next slice
+                startAngle = endAngle;
+            }
+        }
+    </svg>
+
+
+
+    @functions {
+        // Generate a random color
+        string RandomColor()
+        {
+            Random rnd = new Random();
+            return $"rgb({rnd.Next(256)},{rnd.Next(256)},{rnd.Next(256)})";
+        }
+    }
+
+</body>
