@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
-using Aspose.Html;
-using Aspose.Html.Converters;
-using Aspose.Html.Saving;
 
 
 namespace WebApplication1.Pages.Employees
